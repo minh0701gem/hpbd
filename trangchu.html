@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Món Quà Đặc Biệt Gửi Tặng Ngọc Ánh!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; font-family: 'Montserrat', sans-serif; overflow: hidden; background: #1a1a2e;
+            display: flex; justify-content: center; align-items: center; height: 100vh;
+        }
+        .hidden { display: none !important; }
+
+        /* Màn 1: Bắt đầu */
+        #start-screen { text-align: center; color: white; opacity: 1; transition: opacity 1s ease-out; }
+        #start-screen.fade-out { opacity: 0; }
+        .start-content h1 { font-family: 'Dancing Script', cursive; font-size: 3.5rem; margin-bottom: 10px; }
+        .start-content p { font-size: 1.2rem; }
+        #start-btn {
+            margin-top: 30px; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; color: #1a1a2e; background-color: white; border: none; border-radius: 50px; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        #start-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+
+        /* Màn 2, 3: Bánh sinh nhật */
+        #main-content {
+            position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 1s ease-in;
+        }
+        #main-content.visible { opacity: 1; }
+        
+        #confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; }
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; opacity: 0.8; animation: fall 5s linear infinite; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+        .cake-container { position: relative; z-index: 2; transform: scale(1); margin-bottom: 20px; }
+        .cake .candle { fill: #ffffff; stroke: #e0e0e0; stroke-width: 0.5; }
+        .cake .flame { fill: #ffac33; opacity: 1; transition: all 0.5s ease-out; transform-origin: bottom center; }
+        .cake .icing { fill: #f9d7d9; }
+        .cake .layer-top { fill: #ffc0cb; }
+        .cake .layer-middle { fill: #f2a2b3; }
+        .cake .layer-bottom { fill: #e68598; }
+        .cake .plate { fill: #eeeeee; }
+
+        .flame.lit { animation: flicker 1.5s ease-in-out infinite; }
+        .flame.blown-out { opacity: 0 !important; transform: scale(0) translateY(-20px); }
+        @keyframes flicker { 0%, 100% { opacity: 1; transform: scaleY(1); } 50% { opacity: 0.7; transform: scaleY(1.05); } }
+
+        .message-container { z-index: 2; text-align: center; color: white; transition: opacity 1s ease-in-out; }
+        .message-container.hidden { opacity: 0; pointer-events: none; position: absolute; }
+        .message-container h1 { font-family: 'Dancing Script', cursive; font-size: 3.5rem; margin: 0; color: #ffda79; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .message-container p { font-size: 1.2rem; max-width: 500px; margin: 15px auto; }
+        
+        #blow-out-btn, #open-letter-btn {
+            margin-top: 20px; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; background-color: #ffda79; border: none; border-radius: 50px; font-weight: bold; color: #1a1a2e; transition: transform 0.3s, opacity 1s;
+        }
+        #blow-out-btn:hover, #open-letter-btn:hover { transform: scale(1.1); }
+
+        /* Hiệu ứng điều ước */
+        .sparkle {
+            position: absolute; width: 5px; height: 5px; background-color: #ffda79; border-radius: 50%; z-index: 10; pointer-events: none;
+        }
+        
+        /* Màn 4: Thiệp/Thư */
+        #letter-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100;
+        }
+        .letter-content {
+            background-color: #fffaf0; padding: 40px; border-radius: 10px; max-width: 600px; width: 90%; position: relative; font-family: 'Montserrat', sans-serif; color: #333; animation: zoomIn 0.5s;
+        }
+        .letter-content h2 { font-family: 'Dancing Script', cursive; color: #d9534f; font-size: 2.5rem; text-align: center; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #aaa; }
+        @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        @media (max-width: 600px) {
+            .cake-container { transform: scale(0.8); }
+            .message-container h1 { font-size: 2.5rem; }
+            .message-container p { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <div class="start-content">
+            <h1>Một Món Quà Bất Ngờ...</h1>
+            <p>Dành Tặng Riêng Cậu</p>
+            <button id="start-btn">Mở Quà Ngay 🎁</button>
+        </div>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <div id="confetti-container"></div>
+        <div class="cake-container">
+            <svg class="cake" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" width="400" height="300">
+                <g class="candles">
+                    <rect class="candle" x="155" y="70" width="10" height="40" /><rect class="flame lit" x="157.5" y="50" width="5" height="20" />
+                    <rect class="candle" x="195" y="70" width="10" height="40" /><rect class="flame lit" x="197.5" y="50" width="5" height="20" />
+                    <rect class="candle" x="235" y="70" width="10" height="40" /><rect class="flame lit" x="237.5" y="50" width="5" height="20" />
+                </g>
+                <g class="icing"><path d="M120 110 Q 200 140 280 110 L 280 120 Q 200 150 120 120 Z" /></g>
+                <g class="layer layer-top"><rect x="120" y="110" width="160" height="40" /></g>
+                <g class="layer layer-middle"><rect x="110" y="150" width="180" height="40" /></g>
+                <g class="layer layer-bottom"><rect x="100" y="190" width="200" height="40" /></g>
+                <g class="plate"><rect x="90" y="230" width="220" height="10" /></g>
+            </svg>
+        </div>
+
+        <div id="initial-message" class="message-container">
+            <h1>Happy Birthday, Ngọc Ánh!</h1>
+            <p>Cậu hãy ước một điều ước, rồi nhấn nút bên dưới nhé!</p>
+            <button id="blow-out-btn">Thổi nến 🎂</button>
+        </div>
+        
+        <div id="post-blow-message" class="message-container hidden">
+            <h1>Điều ước của cậu...</h1>
+            <p>... đã được gửi đến các vì sao ✨</p>
+            <button id="open-letter-btn">Mở Thiệp Yêu Thương 💌</button>
+        </div>
+    </div>
+
+    <div id="letter-modal" class="hidden">
+        <div class="letter-content">
+            <span class="close-btn">&times;</span>
+            <h2>Gửi cô gái khiến ngày hôm nay trở nên đặc biệt!</h2>
+            <p>Cậu à,</p>
+            <p>Chúc mừng sinh nhật cậu! Chắc hẳn hôm nay cậu sẽ nhận được rất nhiều lời chúc, nhưng tớ vẫn muốn gửi đến cậu những lời chúc đặc biệt nhất từ tớ.</p>
+            <p>Tớ không giỏi văn hay, chỉ mong rằng tuổi mới của cậu sẽ tràn ngập niềm vui và những điều tốt đẹp. Chúc cho nụ cười của cậu sẽ luôn tỏa nắng, và mọi dự định cậu ấp ủ đều sẽ thành hiện thực.</p>
+            <p>Thật lòng mà nói, thế giới của tớ dường như trở nên thú vị và nhiều màu sắc hơn hẳn từ khi có sự xuất hiện của cậu. Cảm ơn cậu vì tất cả nhé.</p>
+	    <p>Mong mọi điều an lành và tuyệt vời nhất sẽ đến với cậu, không chỉ hôm nay mà còn mãi về sau.</p>
+            <p><strong>Minh</strong></p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('start-btn');
+            const startScreen = document.getElementById('start-screen');
+            const mainContent = document.getElementById('main-content');
+            
+            const blowOutBtn = document.getElementById('blow-out-btn');
+            const flames = document.querySelectorAll('.flame');
+            const initialMessage = document.getElementById('initial-message');
+            const postBlowMessage = document.getElementById('post-blow-message');
+            
+            const openLetterBtn = document.getElementById('open-letter-btn');
+            const letterModal = document.getElementById('letter-modal');
+            const closeBtn = document.querySelector('.close-btn');
+
+            startBtn.addEventListener('click', () => {
+                startScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    startScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    mainContent.classList.add('visible');
+                    createConfetti();
+                }, 1000);
+            });
+
+            blowOutBtn.addEventListener('click', () => {
+                createSparkles();
+                flames.forEach(flame => {
+                    flame.classList.remove('lit');
+                    flame.classList.add('blown-out');
+                });
+                setTimeout(() => {
+                    initialMessage.classList.add('hidden');
+                    postBlowMessage.classList.remove('hidden');
+                }, 1000);
+            });
+
+            openLetterBtn.addEventListener('click', () => {
+                letterModal.classList.remove('hidden');
+            });
+            closeBtn.addEventListener('click', () => {
+                letterModal.classList.add('hidden');
+            });
+            letterModal.addEventListener('click', (e) => {
+                if (e.target === letterModal) {
+                    letterModal.classList.add('hidden');
+                }
+            });
+
+            function createSparkles() {
+                flames.forEach(flame => {
+                    const rect = flame.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+                    for (let i = 0; i < 15; i++) {
+                        const sparkle = document.createElement('div');
+                        sparkle.classList.add('sparkle');
+                        sparkle.style.left = x + 'px';
+                        sparkle.style.top = y + 'px';
+                        const angle = Math.random() * 2 * Math.PI;
+                        const distance = Math.random() * 50 + 20;
+                        const translateX = Math.cos(angle) * distance;
+                        const translateY = Math.sin(angle) * distance;
+                        const keyframes = `@keyframes sparkle-animation-${i}-${Date.now()} { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(${translateX}px, ${translateY}px) scale(0); } }`;
+                        const styleSheet = document.createElement("style");
+                        styleSheet.innerText = keyframes;
+                        document.head.appendChild(styleSheet);
+                        sparkle.style.animation = `sparkle-animation-${i}-${Date.now()} 0.8s ease-out forwards`;
+                        document.body.appendChild(sparkle);
+                        setTimeout(() => { sparkle.remove(); styleSheet.remove(); }, 800);
+                    }
+                });
+            }
+
+            function createConfetti() {
+                const confettiContainer = document.getElementById('confetti-container');
+                const colors = ['#ffda79', '#f9d7d9', '#a2de96', '#89cff0', '#e6e6fa', '#f3a683'];
+                const confettiCount = 150;
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDuration = Math.random() * 3 + 4 + 's';
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    confettiContainer.appendChild(confetti);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
